@@ -72,7 +72,7 @@ jobs:
         with:
           task-definition: ecs-task-def.json
           container-name: quarkus-app-container
-          image: ${{ env.IMAGE_URI }}
+          image: ${{ IMAGE_URI }}
 
       - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
