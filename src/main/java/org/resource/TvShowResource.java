@@ -3,6 +3,7 @@ package org.resource;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
 import org.entity.TvShow;
 import org.service.TvShowService;
@@ -14,8 +15,8 @@ public class TvShowResource {
     TvShowService tvShowService;
 
     @GET
-    public Response getTvShow() {
-        TvShow tvShow = tvShowService.getTvShow();
+    public Response getTvShow(@QueryParam("showName") String showName) {
+        TvShow tvShow = tvShowService.getTvShow(showName);
         if (tvShow != null) {
             Response.ok(tvShow);
         }

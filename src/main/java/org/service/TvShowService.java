@@ -11,8 +11,8 @@ public class TvShowService {
     @RestClient
     TvShowClient tvShowClient;
 
-    public TvShow getTvShow() {
-        return tvShowClient.getTvShow();
+    public TvShow getTvShow(String q) {
+        return tvShowClient.getTvShow(q);
     }
 
 }

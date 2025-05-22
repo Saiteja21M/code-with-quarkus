@@ -3,15 +3,16 @@ package org.client;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.QueryParam;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 import org.entity.TvShow;
 
-@Path("/shows")
+@Path("/search")
 @RegisterRestClient(baseUri = "https://api.tvmaze.com")
 @ApplicationScoped
 public interface TvShowClient {
 
     @GET
-    @Path("/2")
-    TvShow getTvShow();
+    @Path("shows")
+    TvShow getTvShow(@QueryParam("q") String q);
 }
