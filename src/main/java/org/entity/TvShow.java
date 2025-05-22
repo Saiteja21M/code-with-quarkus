@@ -201,6 +201,32 @@ public class TvShow {
         public void set_links(Links _links) {
             this._links = _links;
         }
+
+        @Override
+        public String toString() {
+            return "Show{" +
+                    "id=" + id +
+                    ", url='" + url + '\'' +
+                    ", name='" + name + '\'' +
+                    ", type='" + type + '\'' +
+                    ", language='" + language + '\'' +
+                    ", genres=" + genres +
+                    ", status='" + status + '\'' +
+                    ", runtime=" + runtime +
+                    ", averageRuntime=" + averageRuntime +
+                    ", premiered='" + premiered + '\'' +
+                    ", ended='" + ended + '\'' +
+                    ", officialSite='" + officialSite + '\'' +
+                    ", schedule=" + schedule +
+                    ", rating=" + rating +
+                    ", weight=" + weight +
+                    ", network=" + network +
+                    ", image=" + image +
+                    ", summary='" + summary + '\'' +
+                    ", updated=" + updated +
+                    ", _links=" + _links +
+                    '}';
+        }
     }
 
     public static class Schedule {
@@ -223,6 +249,14 @@ public class TvShow {
         public void setDays(List<String> days) {
             this.days = days;
         }
+
+        @Override
+        public String toString() {
+            return "Schedule{" +
+                    "time='" + time + '\'' +
+                    ", days=" + days +
+                    '}';
+        }
     }
 
     public static class Rating {
@@ -235,6 +269,13 @@ public class TvShow {
 
         public void setAverage(double average) {
             this.average = average;
+        }
+
+        @Override
+        public String toString() {
+            return "Rating{" +
+                    "average=" + average +
+                    '}';
         }
     }
 
@@ -276,6 +317,16 @@ public class TvShow {
         public void setOfficialSite(String officialSite) {
             this.officialSite = officialSite;
         }
+
+        @Override
+        public String toString() {
+            return "Network{" +
+                    "id=" + id +
+                    ", name='" + name + '\'' +
+                    ", country=" + country +
+                    ", officialSite='" + officialSite + '\'' +
+                    '}';
+        }
     }
 
     public static class Country {
@@ -306,6 +357,15 @@ public class TvShow {
 
         public void setTimezone(String timezone) {
             this.timezone = timezone;
+        }
+
+        @Override
+        public String toString() {
+            return "Country{" +
+                    "name='" + name + '\'' +
+                    ", code='" + code + '\'' +
+                    ", timezone='" + timezone + '\'' +
+                    '}';
         }
     }
 
@@ -338,6 +398,15 @@ public class TvShow {
         public void setImdb(String imdb) {
             this.imdb = imdb;
         }
+
+        @Override
+        public String toString() {
+            return "Externals{" +
+                    "tvrage=" + tvrage +
+                    ", thetvdb=" + thetvdb +
+                    ", imdb='" + imdb + '\'' +
+                    '}';
+        }
     }
 
     public static class Image {
@@ -359,6 +428,14 @@ public class TvShow {
 
         public void setOriginal(String original) {
             this.original = original;
+        }
+
+        @Override
+        public String toString() {
+            return "Image{" +
+                    "medium='" + medium + '\'' +
+                    ", original='" + original + '\'' +
+                    '}';
         }
     }
 
@@ -382,6 +459,14 @@ public class TvShow {
         public void setPreviousEpisode(PreviousEpisode previousepisode) {
             this.previousepisode = previousepisode;
         }
+
+        @Override
+        public String toString() {
+            return "Links{" +
+                    "self=" + self +
+                    ", previousepisode=" + previousepisode +
+                    '}';
+        }
     }
 
     public static class Self {
@@ -394,6 +479,13 @@ public class TvShow {
 
         public void setHref(String href) {
             this.href = href;
+        }
+
+        @Override
+        public String toString() {
+            return "Self{" +
+                    "href='" + href + '\'' +
+                    '}';
         }
     }
 
@@ -417,5 +509,20 @@ public class TvShow {
         public void setName(String name) {
             this.name = name;
         }
+
+        @Override
+        public String toString() {
+            return "PreviousEpisode{" +
+                    "href='" + href + '\'' +
+                    ", name='" + name + '\'' +
+                    '}';
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "TvShow{" +
+                "show=" + show +
+                '}';
     }
 }
