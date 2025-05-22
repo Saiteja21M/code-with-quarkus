@@ -3,10 +3,13 @@ package org.resource;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
 import org.entity.TvShow;
 import org.service.TvShowService;
+
+import java.util.List;
 
 @Path("show")
 public class TvShowResource {
@@ -15,10 +18,11 @@ public class TvShowResource {
     TvShowService tvShowService;
 
     @GET
+    @Produces("application/json")
     public Response getTvShow(@QueryParam("showName") String showName) {
-        TvShow tvShow = tvShowService.getTvShow(showName);
-        if (tvShow != null) {
-            Response.ok(tvShow);
+        List<TvShow> tvShows = tvShowService.getTvShow(showName);
+        if (tvShows != null && !tvShows.isEmpty()) {
+            return Response.ok(tvShows).build();
         }
         return Response.status(Response.Status.NOT_FOUND).build();
     }

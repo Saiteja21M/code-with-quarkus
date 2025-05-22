@@ -7,6 +7,8 @@ import jakarta.ws.rs.QueryParam;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 import org.entity.TvShow;
 
+import java.util.List;
+
 @Path("/search")
 @RegisterRestClient(baseUri = "https://api.tvmaze.com")
 @ApplicationScoped
@@ -14,5 +16,5 @@ public interface TvShowClient {
 
     @GET
     @Path("shows")
-    TvShow getTvShow(@QueryParam("q") String q);
+    List<TvShow> getTvShow(@QueryParam("q") String q);
 }
