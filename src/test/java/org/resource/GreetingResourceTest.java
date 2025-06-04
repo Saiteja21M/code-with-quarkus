@@ -14,7 +14,7 @@ class GreetingResourceTest {
           .when().get("/home")
           .then()
              .statusCode(200)
-             .body(is("Hello from Quarkus REST - How are you today?"));
+             .body(is("Hello there!!.. How are you today?"));
     }
 
 }
