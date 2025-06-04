@@ -39,7 +39,7 @@ public class TvShow {
         private String summary;
         private long updated;
         @JsonProperty("_links")
-        private Links _links;
+        private Links links;
 
         // Getters and Setters
         public int getId() {
@@ -194,12 +194,12 @@ public class TvShow {
             this.updated = updated;
         }
 
-        public Links get_links() {
-            return _links;
+        public Links getLinks() {
+            return links;
         }
 
-        public void set_links(Links _links) {
-            this._links = _links;
+        public void setLinks(Links links) {
+            this.links = links;
         }
 
         @Override
@@ -224,7 +224,7 @@ public class TvShow {
                     ", image=" + image +
                     ", summary='" + summary + '\'' +
                     ", updated=" + updated +
-                    ", _links=" + _links +
+                    ", _links=" + links +
                     '}';
         }
     }

@@ -9,7 +9,6 @@ import jakarta.ws.rs.core.Response;
 import org.entity.TvShow;
 import org.jboss.logging.Logger;
 import org.service.TvShowService;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
