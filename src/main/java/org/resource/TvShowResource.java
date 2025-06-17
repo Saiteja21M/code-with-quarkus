@@ -27,7 +27,7 @@ public class TvShowResource {
         logger.info("searched for " + showName);
         List<TvShow> tvShows = tvShowService.getTvShow(showName);
         if (tvShows != null && !tvShows.isEmpty()) {
-            logger.info("received result " + tvShows);
+            logger.debug("received result " + tvShows);
             return Response.ok(tvShows).build();
         }
         return Response.status(Response.Status.NOT_FOUND).build();
