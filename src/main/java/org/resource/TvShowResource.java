@@ -25,6 +25,11 @@ public class TvShowResource {
     @Produces("application/json")
     public Response getTvShow(@QueryParam("showName") String showName) {
         logger.info("searched for " + showName);
+        if(showName == null || showName.isEmpty()) {
+            logger.warn("showName query parameter is missing or empty");
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("show name is required").build();
+        }
         List<TvShow> tvShows = tvShowService.getTvShow(showName);
         if (tvShows != null && !tvShows.isEmpty()) {
             logger.debug("received result " + tvShows);
