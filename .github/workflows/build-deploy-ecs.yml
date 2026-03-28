@@ -29,10 +29,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
           cache: maven
 
@@ -55,11 +55,11 @@ jobs:
         env:
           ECR_REGISTRY: ${{steps.login-ecr.outputs.registry}}
           ECR_REPOSITORY: quarkus-app
-          IMAGE_TAG: ${{steps.increment-git-tag.outputs.git-tag}}
+          IMAGE_TAG: latest
         run: |
           docker build -f src/main/docker/Dockerfile.jvm -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
-          echo "IMAGE_URI=$ECR_REGISTRY/$ECR_REPOSITORY:latest" >> $GITHUB_ENV
+          echo "IMAGE_URI=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest" >> $GITHUB_ENV
 
       - name: Download task definition
         run: |
@@ -72,7 +72,7 @@ jobs:
         with:
           task-definition: ecs-task-def.json
           container-name: quarkus-app-container
-          image: ${{ env.IMAGE_URI }}
+          image: ${{ steps.build-image.outputs.image }}
 
       - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1

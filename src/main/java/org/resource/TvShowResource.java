@@ -6,8 +6,9 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
-import org.entity.TvShow;
+
 import org.jboss.logging.Logger;
+import org.model.TvShow;
 import org.service.TvShowService;
 
 import java.util.List;

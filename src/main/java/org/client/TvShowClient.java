@@ -6,8 +6,8 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.QueryParam;
 import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
-import org.entity.TvShow;
 import org.logging.LoggingClientFilter;
+import org.model.TvShow;
 
 import java.util.List;
 
