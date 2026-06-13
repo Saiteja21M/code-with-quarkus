@@ -1,0 +1,142 @@
+.PHONY: help install-argocd refresh-secret deploy-app stop-app stop-argocd full-setup restart
+
+# Configuration
+AWS_ACCOUNT_ID := 751236674196
+AWS_REGION := eu-central-1
+APP_NAME := code-with-quarkus
+ARGOCD_NAMESPACE := argocd
+
+help:
+	@echo "Available targets:"
+	@echo "  make install-argocd      - Install ArgoCD"
+	@echo "  make refresh-secret      - Refresh ECR credentials secret"
+	@echo "  make deploy-app          - Deploy app using kubectl (after ArgoCD is running)"
+	@echo "  make full-setup          - Install ArgoCD, refresh secret, and deploy app"
+	@echo "  make restart             - Restart the app deployment"
+	@echo "  make stop-app            - Stop the app"
+	@echo "  make stop-argocd         - Stop ArgoCD completely"
+	@echo "  make port-forward-app    - Port forward app to localhost:8081"
+	@echo "  make port-forward-argocd - Port forward ArgoCD to localhost:8080"
+
+# Install ArgoCD
+install-argocd:
+	@echo "Installing ArgoCD..."
+	kubectl create namespace $(ARGOCD_NAMESPACE) 2>/dev/null || true
+	@echo "Downloading and installing ArgoCD manifests..."
+	curl -s https://raw.githubusercontent.com/argoproj/argo-cd/v2.11.7/manifests/install.yaml | kubectl apply -n $(ARGOCD_NAMESPACE) -f - || \
+	curl -s https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml | kubectl apply -n $(ARGOCD_NAMESPACE) -f -
+	@echo "Waiting for ArgoCD to be ready..."
+	kubectl wait --for=condition=available --timeout=300s deployment/argocd-server -n $(ARGOCD_NAMESPACE) 2>/dev/null || true
+	@echo "ArgoCD installed successfully!"
+	@echo ""
+	@echo "Default credentials:"
+	@echo "  Username: admin"
+	@echo "  Password: Run 'make argocd-password' to get the initial password"
+
+argocd-password:
+	@kubectl -n $(ARGOCD_NAMESPACE) get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+	@echo ""
+
+# Refresh ECR credentials
+refresh-secret:
+	@echo "Refreshing ECR credentials..."
+	kubectl delete secret ecr-regcred 2>/dev/null || true
+	@echo "Generating fresh ECR token..."
+	@set -e; \
+	TOKEN=$$(aws ecr get-login-password --region $(AWS_REGION)); \
+	echo "Creating new secret..."; \
+	kubectl create secret docker-registry ecr-regcred \
+		--docker-server=$(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com \
+		--docker-username=AWS \
+		--docker-password=$$TOKEN \
+		--docker-email=user@example.com
+	@echo "Secret refreshed successfully!"
+
+# Deploy app using kubectl (manual deployment)
+deploy-app: refresh-secret
+	@echo "Deploying app..."
+	kubectl apply -f k8s/deployment.yaml
+	kubectl apply -f k8s/service.yaml
+	@echo "App deployed successfully!"
+	@echo ""
+	@echo "Access the app:"
+	@echo "  Port-forward: kubectl port-forward svc/$(APP_NAME) 8081:8080"
+	@echo "  Then visit: http://localhost:8081"
+
+# Deploy app using ArgoCD
+deploy-argocd:
+	@echo "Deploying app using ArgoCD..."
+	kubectl apply -f k8s/argocd-application.yaml
+	@echo "App deployed via ArgoCD!"
+	@echo ""
+	@echo "Check status:"
+	@echo "  argocd app get $(APP_NAME) -n $(ARGOCD_NAMESPACE)"
+
+# Full setup: install ArgoCD, refresh secret, and deploy app
+full-setup: install-argocd refresh-secret deploy-argocd
+	@echo ""
+	@echo "✅ Full setup complete!"
+	@echo ""
+	@echo "Next steps:"
+	@echo "1. Access ArgoCD UI: kubectl port-forward svc/argocd-server 8080:443 -n $(ARGOCD_NAMESPACE)"
+	@echo "2. Access your app: kubectl port-forward svc/$(APP_NAME) 8081:8080"
+	@echo "3. Get ArgoCD password: make argocd-password"
+
+# Restart app deployment
+restart:
+	@echo "Restarting $(APP_NAME) deployment..."
+	kubectl rollout restart deployment/$(APP_NAME)
+	kubectl rollout status deployment/$(APP_NAME)
+	@echo "Deployment restarted!"
+
+# Stop app
+stop-app:
+	@echo "Scaling down $(APP_NAME) deployment..."
+	kubectl scale deployment $(APP_NAME) --replicas=0
+	@echo "App stopped!"
+	@echo "To restart: make restart"
+
+# Stop ArgoCD
+stop-argocd:
+	@echo "Deleting ArgoCD namespace..."
+	kubectl delete namespace $(ARGOCD_NAMESPACE)
+	@echo "ArgoCD stopped!"
+
+# Port forward app to localhost:8081
+port-forward-app:
+	@echo "Port forwarding to http://localhost:8081"
+	kubectl port-forward svc/$(APP_NAME) 8081:8080
+
+# Port forward ArgoCD to localhost:8080
+port-forward-argocd:
+	@echo "Port forwarding ArgoCD to https://localhost:8080"
+	@echo "Username: admin"
+	@echo "Password: Run 'make argocd-password' in another terminal"
+	kubectl port-forward -n $(ARGOCD_NAMESPACE) svc/argocd-server 8080:443
+
+# Get app status
+status:
+	@echo "=== Kubernetes Nodes ==="
+	kubectl get nodes -o wide
+	@echo ""
+	@echo "=== ArgoCD Status ==="
+	kubectl get deployment -n $(ARGOCD_NAMESPACE) 2>/dev/null || echo "ArgoCD not installed"
+	@echo ""
+	@echo "=== App Status ==="
+	kubectl get deployment,svc $(APP_NAME) 2>/dev/null || echo "App not deployed"
+	@echo ""
+	@echo "=== Pods ==="
+	kubectl get pods -l app=$(APP_NAME) 2>/dev/null || echo "No app pods running"
+
+# Cleanup everything
+clean:
+	@echo "WARNING: This will delete ArgoCD and the app!"
+	@read -p "Are you sure? (y/N) " -n 1 -r; \
+	echo; \
+	if [[ $$REPLY =~ ^[Yy]$$ ]]; then \
+		kubectl delete namespace $(ARGOCD_NAMESPACE); \
+		kubectl delete deployment,svc $(APP_NAME); \
+		echo "Cleanup complete!"; \
+	else \
+		echo "Cleanup cancelled"; \
+	fi
